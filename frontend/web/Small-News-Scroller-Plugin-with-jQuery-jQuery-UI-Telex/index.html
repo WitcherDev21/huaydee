@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jQuery Telex Plugin Demo</title>
+<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-darkness/jquery-ui.css">
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+<style>
+body { background-color:#656D77; color:#fff; font-size:36px;font-family:'roboto condensed',Arial, Helvetica, sans-serif}
+a { font-size:12px;}
+.cls-second { color:#000; }
+button { border:0; padding:10px; margin: 30px 20px 0 0; background-color:#4FC2E5; color:#fff; font-size:24px; }
+</style>
+</head>
+
+<body>
+<div id="jquery-script-menu">
+<div class="jquery-script-center">
+<ul>
+<li><a href="http://www.jqueryscript.net/text/Small-News-Scroller-Plugin-with-jQuery-jQuery-UI-Telex.html">Download This Plugin</a></li>
+<li><a href="http://www.jqueryscript.net/">Back To jQueryScript.Net</a></li>
+</ul>
+<div class="jquery-script-ads"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- jQuery_demo -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-2783044520727903"
+     data-ad-slot="2780937993"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+<h1 style="margin-top:150px;">jQuery Telex Plugin Demo</h1>
+<div id="tx"></div>
+<button id="pause">Pause</button>
+<button id="resume">Resume</button>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="dist/telex.js"></script>
+<script>
+$('#tx').telex({
+    messages: [
+        {
+            id: 'msg1',
+            content: 'Breaking News 1'
+        },
+        {
+            id: 'msg2',
+            content: 'Breaking News 2',
+            class: 'cls-second'
+        }
+        /* more messages... */
+    ],
+    delay: 0
+    });
+	
+	$( "#pause" ).click(function() {
+  $("#tx").telex("pause");
+});
+$( "#resume" ).click(function() {
+  $("#tx").telex("resume");
+});
+</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

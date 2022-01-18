@@ -1,0 +1,117 @@
+html,
+body {
+    height: 100%;
+}
+
+/* .wrap-content {
+    min-height: 230px;
+    margin-top: 200px;
+    margin-bottom: 25px;
+    padding: 0px 10px 0px 10px;
+     
+} */
+select.form-control:not([size]):not([multiple]) {
+   	height: 100% !important;
+}
+a:hover, a:focus {
+    text-decoration: none !important;
+}
+a:visited{
+	color:inherit;
+}
+
+.bg-warning-light:hover {
+    filter: saturate(1.2);
+    color: white;
+}
+
+.bg-warning-light {
+    background: #ff9b54;
+    background: -moz-linear-gradient(top, #ff9b54 0%, #ef8010 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ff9b54), color-stop(100%, #ef8010));
+    background: -webkit-linear-gradient(top, #ff9b54 0%, #ef8010 100%);
+    background: -o-linear-gradient(top, #ff9b54 0%, #ef8010 100%);
+    background: -ms-linear-gradient(top, #ff9b54 0%, #ef8010 100%);
+    background: linear-gradient(to bottom, #ff9b54 0%, #ef8010 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff9b54', endColorstr='#ef8010', GradientType=0 );
+    -moz-border-radius: 5px!important;
+    border-radius: 5px!important;
+    color: white  !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+    padding: 1px;
+    margin-top: 10px;
+}
+
+
+.bg-success-light:hover {
+    filter: saturate(1.2);
+    color: white;
+}
+
+.bg-success-light {
+    background: rgb(11,188,1);
+    background: -moz-linear-gradient(top, rgba(11,188,1,1) 0%, rgba(13,164,1,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(11,188,1,1)), color-stop(100%, rgba(13,164,1,1)));
+    background: -webkit-linear-gradient(top, rgba(11,188,1,1) 0%, rgba(13,164,1,1) 100%);
+    background: -o-linear-gradient(top, rgba(11,188,1,1) 0%, rgba(13,164,1,1) 100%);
+    background: -ms-linear-gradient(top, rgba(11,188,1,1) 0%, rgba(13,164,1,1) 100%);
+    background: linear-gradient(to bottom, rgba(11,188,1,1) 0%, rgba(13,164,1,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0bbc01', endColorstr='#0da401', GradientType=0 );
+    -moz-border-radius: 5px!important;
+    border-radius: 5px!important;
+    color: white  !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+    padding: 1px;
+    margin-top: 10px;
+}
+
+.bg-danger-light:hover {
+    filter: saturate(1.2);
+    color: white;
+}
+.bg-danger-light {
+    background: #d61515;
+    background: -moz-linear-gradient(top, #d61515 0%, #b50303 100%);
+    background: -webkit-linear-gradient(top, #d61515 0%,#b50303 100%);
+    background: linear-gradient(to bottom, #d61515 0%,#b50303 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d61515', endColorstr='#b50303',GradientType=0 );
+    -moz-border-radius: 5px!important;
+    border-radius: 5px!important;
+    color: white  !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+    padding: 1px;
+    margin-top: 10px;
+}
+
+.bg-default-light:hover {
+    filter: contrast(110%);
+    color: #666;
+}
+.bg-default-light {
+    color: #666;
+    background: rgb(249,249,249);
+    background: -moz-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(204,204,204,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(249,249,249,1)), color-stop(100%, rgba(204,204,204,1)));
+    background: -webkit-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(204,204,204,1) 100%);
+    background: -o-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(204,204,204,1) 100%);
+    background: -ms-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(204,204,204,1) 100%);
+    background: linear-gradient(to bottom, rgba(249,249,249,1) 0%, rgba(204,204,204,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9f9f9', endColorstr='#cccccc', GradientType=0 );
+    -webkit-border-radius: 5px!important;
+    -moz-border-radius: 5px!important;
+    border-radius: 5px!important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+    padding: 1px;
+    margin-top: 10px;
+}
+.img-center{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media only screen and (max-width: 600px) {
+    .img-fluid {
+        max-width: 150% !important;
+        height: auto;
+    }
+}

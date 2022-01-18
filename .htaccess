@@ -1,0 +1,30 @@
+
+RewriteEngine On
+
+#Redirect to WWW
+#RewriteCond %{HTTP_HOST} !^www\. [NC]
+#RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+
+# Hide robot.txt
+RewriteRule ^robots.txt - [L]
+
+# End the processing, if a rewrite already occurred
+RewriteRule ^(frontend|backend)/web/ - [L]
+
+# Rule for Images folder
+RewriteCond %{REQUEST_URI} /(images)
+RewriteRule ^images/(.*)$ images/$1 [L]
+
+# Handle the case of backend, skip ([S=1]) the following 
+RewriteRule ^backoffice(/(.*))?$ backend/web/$2 [S=1]
+
+# handle the case of frontend
+RewriteRule .* frontend/web/$0
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+/web)/.*$ $1/index.php
+
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

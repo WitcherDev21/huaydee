@@ -1,0 +1,262 @@
+.page-wrapper{
+  width:100%;
+  height:100%;
+ background:white;
+ position: fixed;
+}
+
+.blur{
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+}
+
+.pagemodal-wrapper{
+  width:0%;
+  height:100vmax;
+  position: fixed;;
+  top:0; left:0;
+  background:rgba(0,0,0,0.75);
+  /* visibility:hidden; */
+  /* display:none; */
+  opacity:0;
+  -webkit-transition: all 0.25s ease-in-out;
+  -moz-transition: all 0.25s ease-in-out;
+  -o-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
+}
+
+.pagemodal-wrapper.open{
+  opacity:1;
+  width: 100%;
+  /* visibility:visible; */
+  display: block;
+}
+
+.pagemodal{
+  width:100%;
+  height:100%;
+  display:block;
+  /* margin:50% 0 0 -300px; */
+  position:relative;
+  /* top:50%; left:50%; */
+  top:0; left:0;
+  background:#fff;
+  opacity:0;
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+}
+
+.pagemodal-wrapper.open .pagemodal{
+  /* margin-top:-200px; */
+  opacity:1;
+}
+
+.pagemodal .head{
+  width:100%;
+  height:32px;
+  padding:5px;
+  overflow:hidden;
+  background: #dc3545;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.btn-close{
+  width:24px;
+  height:24px;
+  display:block;
+  float:right;
+}
+
+.btn-close::before, .btn-close::after{
+  content:'';
+  width:24px;
+  height:2px;
+  display:block;
+  background:#fff;
+}
+
+.btn-close::before{
+  margin-top:10px;
+  -webkit-transform:rotate(45deg);
+  -moz-transform:rotate(45deg);
+  -o-transform:rotate(45deg);
+  transform:rotate(45deg);
+}
+
+.btn-close::after{
+  margin-top:-2px;
+  -webkit-transform:rotate(-45deg);
+  -moz-transform:rotate(-45deg);
+  -o-transform:rotate(-45deg);
+  transform:rotate(-45deg);
+}
+
+.pagemodal .content{
+    padding-bottom: 50px !important;
+    height: 100vh;
+    position: relative !important;
+    z-index: 10;
+  }
+
+.pagemodal .content .nav-tabs .nav-item{
+    text-align: center;
+    width: auto;
+}
+.pagemodal .nav-tabs .nav-link.active{
+    border-top:7px #a81f2d solid;
+    border-left:1px #a81f2d solid;
+    border-right:1px #a81f2d solid;
+    border-radius: 0;
+    color: #a81f2d;
+}
+.pagemodal ul.nav-tabs li:first-child a.nav-link{
+    border-left: 0px;
+}
+.pagemodal ul.nav-tabs li:last-child a.nav-link{
+    border-right: 0px;
+}
+.pagemodal .nav-link{
+    border-top:7px #ccc solid;
+    border-left: 1px #eee solid;;
+    border-right: 1px #eee solid;
+    border-bottom:1px #a81f2d solid;
+    color: #555;
+    text-shadow: #fff 1px 1px 0px;
+    background: #eee;
+    border-radius: 0;
+    font-size: 110%;
+    padding: 5px;
+}
+.pagemodal .tab-pane{
+    padding: 15px;
+    min-height: 100vmax;
+}
+@media screen and (max-width:768px){
+  .pagemodal table th, .pagemodal table td{
+    font-size:12px;
+  }
+  /* .pagemodal table td b{
+    font-size:14px;
+  } */
+  .pagemodal-wrapper .container{
+    padding: 0px !important;
+    height: auto !important;
+    /* margin-bottom: 52px; */
+    z-index: 1 !important;
+  }
+}
+
+.box__chip-lists .price{
+  background: lightgray !important;
+  border: darkgray 1px solid;
+  border-radius: 2px;
+  padding: 5px;
+  display: inline-flex;
+  margin: 5px;
+  flex: 1 0 21% !important;
+  line-height: 1;
+  text-align: center;
+  justify-content: center;
+}
+.hbill{
+  line-height: 1;
+  vertical-align: middle;
+  font-family: 'NotosansThai', sans-serif;
+  padding-top: 5px;
+}
+.hhuay{
+  line-height: 1 !important;
+  font-weight: 600;
+  font-family: 'NotosansThai', sans-serif;
+  margin-bottom: 0;
+}
+.card-header-sm{
+  padding: 5px 10px !important;
+}
+.card-body-sm{
+  padding: 5px 10px !important;
+}
+.card-huay{
+  margin-bottom: 10px;
+}
+
+#capture {
+  display: block;
+  position: relative;
+  z-index: 99999;
+}
+.cart-item-lists{
+  z-index: 2;
+}
+.fixbot{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: white;
+  display: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top: 1px solid #dee2e6;
+  z-index: 10;
+}
+.pagemodal-wrapper.open .fixbot{
+  display: block;
+}
+#footer-member{
+  overflow: hidden;
+  position: fixed;
+  z-index: 1;
+}
+.content-scroll{
+  height:100%;
+  padding-bottom: 25px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background: white;
+  position: relative;
+  z-index: 9;
+}
+@media (min-width: 576px) {
+  .fixbot {
+    max-width: 510px;
+  }
+}
+@media (min-width: 768px) {
+  .fixbot {
+    max-width: 690px;
+  }
+}
+@media (min-width: 992px) {
+  .fixbot {
+    max-width: 930px;
+  }
+}
+@media (min-width: 1200px) {
+  .fixbot {
+    max-width: 1110px;
+  }
+}
+
+@media screen and (max-width:321px){
+  .box__chip-lists .price {
+    font-size: 12px;
+    margin: 3px;
+  }
+  .fixbot .btn{
+    font-size: 90%;
+    padding: 2px 5px;
+  }
+  .fixbot hr{
+    margin-top:8px;
+  }
+  .fixbot .input-group-append .btn{
+    padding: 3px 10px;
+  }
+}

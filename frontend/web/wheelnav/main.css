@@ -1,0 +1,73 @@
+/* body {
+            background-color: #E7E7E7;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        header {
+            font-size: x-large;
+            text-align: center;
+            background-color: #555;
+            color: #ddd;
+            padding: 5px;
+            font-family: Helvetica, sans-serif;
+            margin-bottom: 50px;
+        }
+
+            header a {
+                background-color: #ddd;
+                color: #555;
+                text-decoration: none;
+                padding: 0 3px 0 3px;
+            }
+
+                header a:hover {
+                    background-color: #555;
+                    color: #ddd;
+                    text-decoration: underline;
+                }
+
+        footer {
+            text-align: center;
+            background-color: #555;
+            color: #ddd;
+            padding: 5px;
+            margin-top: 50px;
+        }
+
+            footer a {
+                background-color: #ddd;
+                color: #555;
+                text-decoration: none;
+                padding: 0 3px 0 3px;
+            }
+
+                footer a:hover {
+                    background-color: #555;
+                    color: #ddd;
+                    text-decoration: underline;
+                } */
+
+        #wheelDiv {
+            height: 400px;
+            width: 400px;
+            margin: auto;
+        }
+
+        #wheelDiv>svg {
+            height: 100%;
+            width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            #wheelDiv {
+                height: 350px;
+                width: 350px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            #wheelDiv {
+                height: 300px;
+                width: 300px;
+            }
+        }
