@@ -24,7 +24,7 @@ class ApiMessageController extends Controller
     {
 
     //หา sms ที่เข้ามาก่อนหน้า 15 นาที และยังไม่ได้ใช้งาน 
-    $time = date('Y-m-d H:i:s', strtotime('-20 minutes'));
+    $time = date('Y-m-d H:i:s', strtotime('-15 minutes'));
     $smsMessage = SmsMessage::find()->where([
         '>' , 'createdAT' , $time,
     ])
