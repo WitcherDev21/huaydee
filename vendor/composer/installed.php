@@ -1,11 +1,11 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => '2323fb6cc22a3e659648072349bb3ade35f2f1eb',
         'name' => 'yiisoft/yii2-app-advanced',
         'dev' => true,
     ),
@@ -291,6 +291,17 @@
                 0 => '3.3.x-dev',
             ),
             'reference' => '03ba59884bf8f087663b7e1c8271b65c3172f799',
+            'dev_requirement' => false,
+        ),
+        'kartik-v/yii2-helpers' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../kartik-v/yii2-helpers',
+            'aliases' => array(
+                0 => '1.3.x-dev',
+            ),
+            'reference' => '1954c59dbd147af7aa791e172775036eb7ffa505',
             'dev_requirement' => false,
         ),
         'kartik-v/yii2-krajee-base' => array(
@@ -1014,12 +1025,12 @@
             'dev_requirement' => false,
         ),
         'yiisoft/yii2-app-advanced' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => '2323fb6cc22a3e659648072349bb3ade35f2f1eb',
             'dev_requirement' => false,
         ),
         'yiisoft/yii2-authclient' => array(

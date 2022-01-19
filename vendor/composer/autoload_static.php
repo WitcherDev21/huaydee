@@ -66,6 +66,7 @@ class ComposerStaticInitee5825b7f226481e3e8100edaaa61a85
             'kartik\\select2\\' => 15,
             'kartik\\plugins\\fileinput\\' => 25,
             'kartik\\mpdf\\' => 12,
+            'kartik\\helpers\\' => 15,
             'kartik\\grid\\' => 12,
             'kartik\\form\\' => 12,
             'kartik\\file\\' => 12,
@@ -244,6 +245,10 @@ class ComposerStaticInitee5825b7f226481e3e8100edaaa61a85
         'kartik\\mpdf\\' => 
         array (
             0 => __DIR__ . '/..' . '/kartik-v/yii2-mpdf/src',
+        ),
+        'kartik\\helpers\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-helpers/src',
         ),
         'kartik\\grid\\' => 
         array (
