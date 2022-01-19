@@ -2,13 +2,13 @@
 
 use common\models\ThaiSharedGameChitDetail;
 use yii\helpers\Url;
-use yii\bootstrap\Html;
+//use yii\bootstrap\Html;
 //use yii\grid\GridView;
 use common\libs\Constants;
-use yii\widgets\Pjax;
-use kartik\export\ExportMenu;
+//use yii\widgets\Pjax;
 use kartik\grid\GridView;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use kartik\export\ExportMenu;
+use kartik\helpers\Html;
 
 ini_set('memory_limit', '-1');
 
@@ -44,133 +44,150 @@ $today = date('Y-m-d H:i:s');
                     <div class="tab-content">
                         <div id="list-current-lottery" class="tab-pane fade in active">
                             <?= $this->render('_search', ['searchModel' => $searchModel]) ?>
-                            <?php Pjax::begin(['id' => 'list-thai-shared-game']) ?>
+                            <?php /*Pjax::begin(['id' => 'list-thai-shared-game'])*/ ?>
                             <?php
-                            echo ExportMenu::widget([
-                                'dataProvider' => $dataProvider,
-                                
-                                'columnSelectorOptions'=>[
-                                    'label' => 'Cols...',
+                            $gridColumns  = [
+                                [
+                                    'label' => 'เลขที่รายการ',
+                                    'value' => function ($model) {
+                                        return $model->id;
+                                    }
                                 ],
-                                'hiddenColumns'=>[0, 9], // SerialColumn & ActionColumn
-                                'disabledColumns'=>[1, 2], // ID & Name
-                                'dropdownOptions' => [
-                                    'label' => 'Export All',
-                                    'class' => 'btn btn-outline-secondary btn-default'
-                                ]
-                            ]) . "<hr>\n".
-                            GridView::widget([
-                                'dataProvider' => $dataProvider,
-                                'columns' => [
-                                    [
-                                        'label' => 'เลขที่รายการ',
-                                        'value' => function ($model) {
-                                            return $model->id;
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'สมาชิก',
-                                        'value' => function ($model) {
-                                            return $model->user['username'];
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'เอเย็นต์',
-                                        'value' => function ($model) {
-                                            $agent = \common\models\User::findOne([$model->user['agent']]);
-                                            return (!empty($agent) ? $agent->username : '');
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'รายการโพยหวยหุ้น',
-                                        'value' => function ($model) {
-                                            return $model->thaiSharedGame->title;
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'วันที่ / เวลา',
-                                        'attribute' => 'createdAt',
-                                        'value' => function ($model) {
-                                            return date('d/m/Y H:i:s', strtotime($model->createdAt));
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'เงินเดิมพัน',
-                                        'value' => function ($model) {
-                                            return number_format($model->totalAmount, 2);
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'ยอดเงินหลังส่วนลด',
-                                        'value' => function ($model) {
-                                            $totalAmount = ThaiSharedGameChitDetail::find()->where(['thaiSharedGameChitId' => $model->id])->sum('discount');
-                                            return number_format($totalAmount, 2);
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'ผลชนะ',
-                                        'format' => 'html',
-                                        'value' => function ($model) {
-                                            $result = 'รอผล';
-                                            if ($model->status == Constants::status_finish_show_result) {
-                                                if ($model->getIsWin()) {
-                                                    $result = '<div style="color:' . Constants::color_credit_in . '">' . $model->getTotalWinCredit() . '</div>';
-                                                } else {
-                                                    $result = '<div style="color:' . Constants::color_credit_out . '">' . '0' . '</div>';
-                                                }
-                                            } else if ($model->status == Constants::status_cancel) {
-                                                $result = '<div>' . '0' . '</div>';
-                                            }
-                                            return $result;
-
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'สถานะ',
-                                        'format' => 'html',
-                                        'value' => function ($model) {
-                                            return '<a href="javascript:;" class="btn btn-xs btn-' . Constants::$statusIcon[$model->status] . '" style="color:#ffffff;">'
-                                                . Constants::$status[$model->status] . '</a>';
-                                        }
-                                    ],
-                                    [
-                                        'label' => 'ดูโพย',
-                                        'format' => 'html',
-                                        'value' => function ($model) use ($active_tab) {
-                                            $btn = 'btn-info';
-                                            $text = 'view';
-                                            if ($model->thaiSharedGame->gameId === Constants::LOTTERYLAODISCOUNTGAME || $model->thaiSharedGame->gameId === Constants::LOTTERYLAOGAME || $model->thaiSharedGame->gameId === Constants::LOTTERY_VIETNAM_SET) {
-                                                $url =
-                                                    [
-                                                        'thai-shared-game/detail-lottery-lao-set',
-                                                        'thaiSharedGameChitId' => $model->id,
-                                                        'from' => $active_tab
-                                                    ];
+                                [
+                                    'label' => 'สมาชิก',
+                                    'value' => function ($model) {
+                                        return $model->user['username'];
+                                    }
+                                ],
+                                [
+                                    'label' => 'เอเย็นต์',
+                                    'value' => function ($model) {
+                                        $agent = \common\models\User::findOne([$model->user['agent']]);
+                                        return (!empty($agent) ? $agent->username : '');
+                                    }
+                                ],
+                                [
+                                    'label' => 'รายการโพยหวยหุ้น',
+                                    'value' => function ($model) {
+                                        return $model->thaiSharedGame->title;
+                                    }
+                                ],
+                                [
+                                    'label' => 'วันที่ / เวลา',
+                                    'attribute' => 'createdAt',
+                                    'value' => function ($model) {
+                                        return date('d/m/Y H:i:s', strtotime($model->createdAt));
+                                    }
+                                ],
+                                [
+                                    'label' => 'เงินเดิมพัน',
+                                    'value' => function ($model) {
+                                        return number_format($model->totalAmount, 2);
+                                    }
+                                ],
+                                [
+                                    'label' => 'ยอดเงินหลังส่วนลด',
+                                    'value' => function ($model) {
+                                        $totalAmount = ThaiSharedGameChitDetail::find()->where(['thaiSharedGameChitId' => $model->id])->sum('discount');
+                                        return number_format($totalAmount, 2);
+                                    }
+                                ],
+                                [
+                                    'label' => 'ผลชนะ',
+                                    'format' => 'html',
+                                    'value' => function ($model) {
+                                        $result = 'รอผล';
+                                        if ($model->status == Constants::status_finish_show_result) {
+                                            if ($model->getIsWin()) {
+                                                $result = '<div style="color:' . Constants::color_credit_in . '">' . $model->getTotalWinCredit() . '</div>';
                                             } else {
-                                                $url =
-                                                    [
-                                                        'thai-shared-game/detail',
-                                                        'thaiSharedGameChitId' => $model->id,
-                                                        'from' => $active_tab
-                                                    ];
+                                                $result = '<div style="color:' . Constants::color_credit_out . '">' . '0' . '</div>';
                                             }
-                                            $result = Html::a(Yii::t('app', ' {modelClass}', [
-                                                'modelClass' => $text,
-                                            ]), $url,
-                                                [
-                                                    'class' => 'btn btn-xs ' . $btn,
-                                                    'style' => 'color:#ffffff;'
-                                                ]
-                                            );
-
-                                            return $result;
+                                        } else if ($model->status == Constants::status_cancel) {
+                                            $result = '<div>' . '0' . '</div>';
                                         }
+                                        return $result;
+
+                                    }
+                                ],
+                                [
+                                    'label' => 'สถานะ',
+                                    'format' => 'html',
+                                    'value' => function ($model) {
+                                        return '<a href="javascript:;" class="btn btn-xs btn-' . Constants::$statusIcon[$model->status] . '" style="color:#ffffff;">'
+                                            . Constants::$status[$model->status] . '</a>';
+                                    }
+                                ],
+                                [
+                                    'label' => 'ดูโพย',
+                                    'format' => 'html',
+                                    'value' => function ($model) use ($active_tab) {
+                                        $btn = 'btn-info';
+                                        $text = 'view';
+                                        if ($model->thaiSharedGame->gameId === Constants::LOTTERYLAODISCOUNTGAME || $model->thaiSharedGame->gameId === Constants::LOTTERYLAOGAME || $model->thaiSharedGame->gameId === Constants::LOTTERY_VIETNAM_SET) {
+                                            $url =
+                                                [
+                                                    'thai-shared-game/detail-lottery-lao-set',
+                                                    'thaiSharedGameChitId' => $model->id,
+                                                    'from' => $active_tab
+                                                ];
+                                        } else {
+                                            $url =
+                                                [
+                                                    'thai-shared-game/detail',
+                                                    'thaiSharedGameChitId' => $model->id,
+                                                    'from' => $active_tab
+                                                ];
+                                        }
+                                        $result = Html::a(Yii::t('app', ' {modelClass}', [
+                                            'modelClass' => $text,
+                                        ]), $url,
+                                            [
+                                                'class' => 'btn btn-xs ' . $btn,
+                                                'style' => 'color:#ffffff;'
+                                            ]
+                                        );
+
+                                        return $result;
+                                    }
+                                ],
+                            ];
+
+                            $fullExportMenu = ExportMenu::widget([
+                                'dataProvider' => $dataProvider,
+                                'columns' => $gridColumns,
+                                'target' => ExportMenu::TARGET_BLANK,
+                                'pjaxContainerId' => 'list-thai-shared-game',
+                                'exportContainer' => [
+                                    'class' => 'btn-group mr-2 me-2'
+                                ],
+                                'dropdownOptions' => [
+                                    'label' => 'ทั้งหมด',
+                                    'class' => 'btn btn-outline-secondary btn-default',
+                                    'itemsBefore' => [
+                                        '<div class="dropdown-header">ส่งออกข้อมูลทั้งหมด</div>',
                                     ],
                                 ],
+                            ]);
+                            echo GridView::widget([
+                                'dataProvider' => $dataProvider,
+                                'columns' => $gridColumns,
+                                'pjax' => true,
+                                'pjaxSettings' => ['options' => ['id' => 'list-thai-shared-game']],
+                                'panel' => [
+                                    'type' => GridView::TYPE_LIGHT,
+                                ],
+                                'exportContainer' => [
+                                    'class' => 'btn-group mr-2 me-2'
+                                ],
+                                // your toolbar can include the additional full export menu
+                                'toolbar' => [
+                                    $fullExportMenu,                                    
+                                ]
 
                             ]);
                             ?>
-                            <?php Pjax::end() ?>
+                            <?php /*Pjax::end()*/ ?>
                             <div style="color: #ff0000">อัพเดทล่าสุด <?= date('d/m/Y H:i:s') ?></div>
                         </div>
                     </div>
