@@ -43,6 +43,7 @@ class AnswerGameController extends Controller
 
     public function actionYeekeeAnswer($authKey)
     {
+        //echo "<pre>",var_dump($result),"</pre>";exit;
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $game = Games::find()->where(['id' => Constants::YEEKEE, 'status' => 1, 'gameAuthKey' => $authKey])->one();
         if (!$game) {
@@ -52,13 +53,12 @@ class AnswerGameController extends Controller
         }
         //$admin_id = \Yii::$app->user->identity->id;
         $admin_id = Constants::user_system_id;// fix
-
         $now = time();
         $result = true;
-
         $watchYeekee = YeekeeSearch::find()->where(['in', 'status', [Constants::status_active, Constants::status_processing, Constants::status_processing_2]])
-            ->orderBy(['finish_at' => SORT_ASC])->one();
-
+             ->orderBy(['finish_at' => SORT_ASC])->one();
+        // $watchYeekee = YeekeeSearch::find()->where(['in', 'status', [Constants::status_active, Constants::status_processing]])
+        //      ->orderBy(['finish_at' => SORT_ASC])->one();    
         if (empty($watchYeekee)) {
             return [
                 'now' => date('Y-m-d H:i:s'),
@@ -68,19 +68,17 @@ class AnswerGameController extends Controller
                 'reason' => 'yeekee is empty'
             ];
         }
-
         //หมดเวลารับแทง ให้ปิดรอบ ปรับสถานะ  ตรงนี้อาจจะทำให้ปิดรับแทงก่อน และปล่อยให้ยิงเลขได้อยู่
         //$now =  strtotime($watchYeekee->finish_at); //test  change status step 1
         //$now = strtotime("+2 minutes",strtotime($watchYeekee->finish_at)); //test step 2 ปิดรอบ
         //$now = strtotime("+18 minutes",$now); //test step 2 ปิดรอบ
         if ($now >= strtotime($watchYeekee->finish_at)) {
             //$transaction = \Yii::$app->db->beginTransaction(); //for test
-
             $finishTime = strtotime("+2 minutes", strtotime($watchYeekee->finish_at));
             $watchYeekee->status = Constants::status_processing;
             $watchYeekee->update_at = date('Y-m-d H:i:s');
             $watchYeekee->update_by = $admin_id;
-            $result = $watchYeekee->save();
+            $result = $watchYeekee->save();            
             if (!$result) {
                 Yii::$app->runAction('system/cancel-yeekee', ['id' => $watchYeekee->id]);
             }
@@ -93,7 +91,6 @@ class AnswerGameController extends Controller
                     'reason' => '2 min. more can yeekee post. |' . date('d/m/Y H:i:s', $finishTime)
                 ];
             }
-
             // more step check
             $finishTime = strtotime("+18 seconds", $finishTime);
             $watchYeekee->status = Constants::status_processing_2;
@@ -103,15 +100,16 @@ class AnswerGameController extends Controller
             if (!$result) {
                 Yii::$app->runAction('system/cancel-yeekee', ['id' => $watchYeekee->id]);
             }
-
-            $yeekeeChitAll = YeekeeChitSearch::find()->where(['yeekee_id' => $watchYeekee->id])->all();
+            $yeekeeChitAll = YeekeeChitSearch::find()->where(['yeekee_id' => $watchYeekee->id])->all();   
+            //echo "<pre>",var_dump($watchYeekee->id),"</pre>";exit();    
             foreach ($yeekeeChitAll as $yeekeeChit) {
                 $queue = new Queue();
                 $queue->gameId = Constants::YEEKEE;
                 $queue->userId = $yeekeeChit->user_id;
                 $queue->status = Constants::status_active;
-                $queue->save(true);
+                $queue->save(true);                
             }
+            
             if ($now < $finishTime) {
                 return [
                     'now' => date('Y-m-d H:i:s'),
@@ -127,14 +125,18 @@ class AnswerGameController extends Controller
                 ->orderBy(['id' => SORT_DESC])
                 ->all();
 
+                if (count($yeekeePost) <= 20) {
+                    Yii::$app->runAction('api-yeekee/gen-yeekee-post', ['authKey' =>'yeekee_rumruay', 'post_amount' =>3]);
+                    return ['message' => 'test'];
+                }  
+
             $sumYeekeePost = 0;
             foreach ($yeekeePost as $post) {
                 $sumYeekeePost += (1 * $post->post_num);
-            }
-
+            }  
             //หารายการโพยทั้งหมด ในรอบนี้
-            $yeekeeChitAll = YeekeeChitSearch::find()->where(['yeekee_id' => $watchYeekee->id])->all();
-            $lenghtSumYeekeePost = strlen((string)$sumYeekeePost);
+            $yeekeeChitAll = YeekeeChitSearch::find()->where(['yeekee_id' => $watchYeekee->id])->all();            
+            $lenghtSumYeekeePost = strlen((string)$sumYeekeePost);           
             if (count($yeekeePost) < Constants::minimum_post || ($sumYeekeePost <= 0) && $watchYeekee->isOpenBot === 1) {
                 //คืนเครดิต
                 $transaction = \Yii::$app->db->beginTransaction();
@@ -194,8 +196,8 @@ class AnswerGameController extends Controller
 
             //user 16th
             $user_16 = $yeekeePost[15];
-
-            $resultYeekee = $sumYeekeePost - $user_16->post_num;
+            
+            $resultYeekee = $sumYeekeePost - $user_16->post_num;            
             ///------------------start bot
             $outlay = 0;
             $income = 0;
@@ -236,6 +238,8 @@ class AnswerGameController extends Controller
             $fair_amount = $income - $estimate_income_credit;
             //check fix number
             $fixNumberYeekees = FixNumberYeekee::find()->where(['yeekeeId' => $watchYeekee->id])->one();
+            
+
             if ($fixNumberYeekees) {
                 $yeekeePost = YeekeePost::find()->where(['yeekee_id' => $watchYeekee->id])
                     ->orderBy(['id' => SORT_DESC])
@@ -311,7 +315,7 @@ class AnswerGameController extends Controller
 //                $resultYeekee = $new_sumYeekeePost - $yeekeePost[14]->post_num;
 //                $user_1->id =  $new_yeekeePost->id;
 //                $user_16->id =  $yeekeePost[14]->id;
-            }else {
+            }else {                
                 \Yii::info('yeekee Id: '.$watchYeekee->id, 'yeekee_answer');
                 \Yii::info('round: '.$watchYeekee->round, 'yeekee_answer');
                 \Yii::info("Outlay Before Value: ".$outlay, 'yeekee_answer');
@@ -351,13 +355,16 @@ class AnswerGameController extends Controller
 
                         $income = 0;
                         $outlay = 0;
-                        foreach ($yeekeeChitAll as $yeekeeChit) {
-                            $detailInChit = $yeekeeChit->yeekeeChitDetails;
-                            foreach ($detailInChit as $detailSearch) {
-                                $income += $detailSearch->amount;
-                                $outlay += YeekeeChitDetailSearch::getWinCreditStatic($new_resultYeekee, $detailSearch->play_type_code, $detailSearch->number, $detailSearch->amount);
+                        //echo "<pre>",var_dump($watchYeekee->id),"</pre>";exit;
+                        try {
+                            foreach ($yeekeeChitAll as $key => $yeekeeChit) {                            
+                                $detailInChit = $yeekeeChit->yeekeeChitDetails;
+                                foreach ($detailInChit as $detailSearch) {
+                                    $income += $detailSearch->amount;
+                                    $outlay += YeekeeChitDetailSearch::getWinCreditStatic($new_resultYeekee, $detailSearch->play_type_code, $detailSearch->number, $detailSearch->amount);
+                                }
                             }
-                        }
+                        }catch(\Exception $e) { return $e->getMessage(); exit;}  
                         if (($outlay < $fair_amount)) {
                             $re_cal = true;
                         }
