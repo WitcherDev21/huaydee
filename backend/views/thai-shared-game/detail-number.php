@@ -145,6 +145,13 @@ $params['breadcrumbs'][] = '#'.$numberja ;
                                 }
                                 return $result;
                             }
+                        ],
+                        [
+                            'label' => 'ยกเลิก',
+                            'format' => 'html',
+                            'value' => function ($model) {
+                                return '<div class="btn btn-xs btn-danger  text-center">ยกเลิกรายบุคล</div>';
+                            }
                         ]
                     ],
                     'showFooter' => true,
