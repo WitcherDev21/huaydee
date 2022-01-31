@@ -999,10 +999,17 @@ $totalWinCreditReserveThaiShared = 0;
                         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                             <?php
                             $arr = ['three_top', 'three_tod', 'two_top', 'two_under', 'run_top', 'run_under', 'three_top2', 'three_und2'];
+                            $arrnew = [9, 10, 11, 12, 13, 14, 25, 26];
                             foreach ($dataLotterys as $key => $val) {
+                                //echo "<pre>",var_dump($val),"</pre>";
+                                //exit();
                                 $amountLotteryThaiShared = 0;
                                 $discountLotteryThaiShared = 0;
+                                $win_modelLotteryThaiShared = 0;
                                 $win_creditLotteryThaiShared = 0;
+                                foreach ($arrnew as $key => $value) {
+                                    $win_modelLotteryThaiShared = $win_modelLotteryThaiShared + (!empty($val['win_model_c'][$value]) ? $val['win_model_c'][$value] : 0);
+                                }
                                 foreach ($arr as $t) {
                                     $amountLotteryThaiShared = $amountLotteryThaiShared + (!empty($val[$t]) ? $val[$t]['amount'] : 0);
                                     $discountLotteryThaiShared = $discountLotteryThaiShared + (!empty($val[$t]) ? $val[$t]['discount'] : 0);
@@ -1037,6 +1044,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <th>วันที่ - เวลา</th>
                                                     <th>ยอดแทง</th>
                                                     <th>ยอดส่วนลด</th>
+                                                    <th>ยอดคาดการณ์</th>
                                                     <th>ยอดถูก</th>
                                                 </tr>
                                                 </thead>
@@ -1046,13 +1054,15 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_top']) ? number_format($val['run_top']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_top']) ? number_format($val['run_top']['discount'], 2) : '0'); ?></td>
-                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_top']) ? number_format($val['run_top']['win_credit'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][23]) ? number_format($val['win_model_c'][23], 2): '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_top']) ? number_format($val['run_top']['win_credit'], 2) : '0'); ?></td>                                                    
                                                 </tr>
                                                 <tr>
                                                     <td>วิ่งล่าง</td>
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_under']) ? number_format($val['run_under']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_under']) ? number_format($val['run_under']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][24]) ?  number_format($val['win_model_c'][24], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['run_under']) ? number_format($val['run_under']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1060,6 +1070,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_tod']) ? number_format($val['three_tod']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_tod']) ? number_format($val['three_tod']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][20]) ? number_format($val['win_model_c'][20], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_tod']) ? number_format($val['three_tod']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1067,6 +1078,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_top']) ? number_format($val['three_top']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_top']) ? number_format($val['three_top']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][19]) ? number_format($val['win_model_c'][19], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_top']) ? number_format($val['three_top']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1074,6 +1086,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['two_top']) ? number_format($val['two_top']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['two_top']) ? number_format($val['two_top']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][21]) ? number_format($val['win_model_c'][21], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['two_top']) ? number_format($val['two_top']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1081,6 +1094,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['two_under']) ? number_format($val['two_under']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['two_under']) ? number_format($val['two_under']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][22]) ? number_format($val['win_model_c'][22], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['two_under']) ? number_format($val['two_under']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1088,6 +1102,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_top2']) ? number_format($val['three_top2']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_top2']) ? number_format($val['three_top2']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][25]) ? number_format($val['win_model_c'][25], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_top2']) ? number_format($val['three_top2']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1095,6 +1110,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_und2']) ? number_format($val['three_und2']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_und2']) ? number_format($val['three_und2']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][26]) ? number_format($val['win_model_c'][26], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['three_und2']) ? number_format($val['three_und2']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1102,6 +1118,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['four_dt']) ? number_format($val['four_dt']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['four_dt']) ? number_format($val['four_dt']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][35]) ? number_format($val['win_model_c'][35], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['four_dt']) ? number_format($val['four_dt']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1109,6 +1126,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: center;"><?php echo $val['create_at']; ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['four_tod']) ? number_format($val['four_tod']['amount'], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['four_tod']) ? number_format($val['four_tod']['discount'], 2) : '0'); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['win_model_c'][36]) ? number_format($val['win_model_c'][36], 2) : '0'); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo(!empty($val['four_tod']) ? number_format($val['four_tod']['win_credit'], 2) : '0'); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1116,6 +1134,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: right; padding-right: 20px;">ยอดรวม</td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo number_format($amountLotteryThaiShared, 2); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo number_format($discountLotteryThaiShared, 2); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"><?php echo number_format($win_modelLotteryThaiShared, 2); ?></td>
                                                     <td style="text-align: right; padding-right: 20px;"><?php echo number_format($win_creditLotteryThaiShared, 2); ?></td>
                                                 </tr>
                                                 <tr>
@@ -1124,6 +1143,7 @@ $totalWinCreditReserveThaiShared = 0;
                                                     <td style="text-align: right; padding-right: 20px;"><?php
                                                         $totalAmountGovernment = $amountLotteryThaiShared - $win_creditLotteryThaiShared;
                                                         echo number_format($totalAmountGovernment, 2); ?></td>
+                                                    <td style="text-align: right; padding-right: 20px;"></td>
                                                     <td style="text-align: right; padding-right: 20px;"></td>
                                                     <td style="text-align: right; padding-right: 20px;"></td>
                                                 </tr>

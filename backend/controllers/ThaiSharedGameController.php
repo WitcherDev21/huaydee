@@ -133,6 +133,34 @@ class ThaiSharedGameController extends Controller
             'from' => $from
         ]);
     }
+    public function actionCancelNumberByUser($number,$createdAt,$endDate,$playTypeId,$uid)
+    {
+      // echo "<pre>",var_dump($number),"</pre>";exit();
+       \Yii::$app->response->format = Response::FORMAT_JSON;
+       $thaiSharedGameChit = ThaiSharedGameChitDetail::find()->Where(['number'=> $number,'userId' => $uid])->andFilterWhere(['between', 'createdAt', $createdAt, $endDate.' 23:59:59'])->one();
+       //echo "<pre>",var_dump($thaiSharedGameChit),"</pre>";exit();
+       if (!$thaiSharedGameChit) {
+           return ['message' => Yii::t('app', 'ไม่สามารถแก้ไขข้อมูลได้ Code:01'),'s' => 'error'];
+       }
+       $Credit = Credit::findOne(['user_id'=> $uid]);
+       $balance = $Credit->balance;
+       $Credit->balance = $balance+ $thaiSharedGameChit->amount;
+       if (!$Credit->save()) {
+           return ['message' => Yii::t('app', 'ไม่สามารถแก้ไขข้อมูลได้ Code:C'),'s' => 'error'];
+       }
+       $credit_transection =  Yii::$app->db->createCommand("INSERT INTO `credit_transection` 
+       (`id`, `action_id`, `operator_id`, `reciver_id`, `amount`, `balance`, `remark`, `create_at`, `create_by`, `update_at`, `update_by`, `reason_action_id`, `credit_master_balance`) 
+       VALUES 
+       (NULL, '1', $uid, $uid, $thaiSharedGameChit->amount, $balance, 'คืนยอดแทงหวย / ".date('Y-m-d H:i:s')." #".$number."', '".date('Y-m-d H:i:s')."', $uid, NULL, NULL, 6, $Credit->balance);")->execute();
+       if(!$credit_transection){
+           return ['message' => Yii::t('app', 'ไม่สามารถแก้ไขข้อมูลได้ Code:CT'),'s' => 'error'];
+       }
+       $ThaiSharedGameChitDetail = ThaiSharedGameChitDetail::findOne($thaiSharedGameChit->id);
+       if (!$ThaiSharedGameChitDetail->delete()) {
+           return ['message' => Yii::t('app', 'ไม่สามารถแก้ไขข้อมูลได้ Code:TSHCD'),'s' => 'error'];
+       }    
+
+    }
     public function actionCancelNumber($number,$createdAt,$endDate,$playTypeId)
     {     
         \Yii::$app->response->format = Response::FORMAT_JSON;

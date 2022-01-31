@@ -188,7 +188,7 @@ function abort_poy(nb,start,end,playtypeid) {
                             });
                         window.setTimeout(function(){ } ,3000);
                         location.reload();              
-                //window.location.reload();
+                        //window.location.reload();
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 //show('loading', false);
