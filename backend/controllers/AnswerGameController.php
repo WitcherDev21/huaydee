@@ -40,6 +40,22 @@ class AnswerGameController extends Controller
             ],
         ];
     }
+    public function print_mem()
+    {
+        /* หน่วยความจำที่ใช้ในปัจจุบัน  */
+        $mem_usage = memory_get_usage();
+        
+        /* การใช้หน่วยความจำสูงสุด  */
+        $mem_peak = memory_get_peak_usage();
+        echo 'The script is now using: <strong>' . round($mem_usage / 1024) . 'KB</strong> of memory.<br>';
+        echo 'Peak usage: <strong>' . round($mem_peak / 1024) . 'KB</strong> of memory.<br><br>';
+    }
+    public function ck_mem()
+    {
+        if(memory_get_usage() >= 1000000000){
+            return false;
+        }
+    }
 
     public function actionYeekeeAnswer($authKey)
     {
@@ -103,6 +119,7 @@ class AnswerGameController extends Controller
             $yeekeeChitAll = YeekeeChitSearch::find()->where(['yeekee_id' => $watchYeekee->id])->all();   
             //echo "<pre>",var_dump($watchYeekee->id),"</pre>";exit();    
             foreach ($yeekeeChitAll as $yeekeeChit) {
+                $this->ck_mem();
                 $queue = new Queue();
                 $queue->gameId = Constants::YEEKEE;
                 $queue->userId = $yeekeeChit->user_id;
@@ -132,6 +149,7 @@ class AnswerGameController extends Controller
 
             $sumYeekeePost = 0;
             foreach ($yeekeePost as $post) {
+                $this->ck_mem();
                 $sumYeekeePost += (1 * $post->post_num);
             }  
             //หารายการโพยทั้งหมด ในรอบนี้
@@ -141,6 +159,7 @@ class AnswerGameController extends Controller
                 //คืนเครดิต
                 $transaction = \Yii::$app->db->beginTransaction();
                 foreach ($yeekeeChitAll as $yeekeeChit) {
+                    $this->ck_mem();
                     $remark = Constants::$reason_credit[Constants::reason_credit_cancel] . ' จับยี่กีรอบที่ ' . $watchYeekee->round . '/' . date('d/m/Y', strtotime($watchYeekee->date_at)) . ' #' . $yeekeeChit->getOrderId();
                     if (Credit::creditWalk(Constants::action_credit_top_up, $yeekeeChit->user_id, $admin_id, Constants::reason_credit_cancel, $yeekeeChit->total_amount, $remark)) {
                         $yeekeeChit->status = Constants::status_cancel;
@@ -204,8 +223,10 @@ class AnswerGameController extends Controller
             $commission_user_agent_play = [];
             //add queue process
             foreach ($yeekeeChitAll as $yeekeeChit) {
+                $this->ck_mem();
                 $detailInChit = $yeekeeChit->yeekeeChitDetails;
                 foreach ($detailInChit as $detail) {
+                    $this->ck_mem();
                     $detailSearch = YeekeeChitDetailSearch::findOne(['id' => $detail->id]);
                     $income += $detailSearch->amount;
                     $pay = YeekeeChitDetailSearch::getWinCreditStatic($resultYeekee, $detailSearch->play_type_code, $detailSearch->number, $detailSearch->amount);
@@ -247,6 +268,7 @@ class AnswerGameController extends Controller
 
                 $sumYeekeePost = 0;
                 foreach ($yeekeePost as $post) {
+                    $this->ck_mem();
                     $sumYeekeePost += (1 * $post->post_num);
                 }
                 $a = $sumYeekeePost;
@@ -323,6 +345,7 @@ class AnswerGameController extends Controller
                 \Yii::info("Result Yeekee Before Value: ".$resultYeekee, 'yeekee_answer');
                 if ($outlay > $fair_amount && $watchYeekee->isOpenBot === 1) {   //ถ้าระบบ จ่ายหนักกว่า ที่ตั้งไว้
                     do {
+                        $this->ck_mem();
                         $cal_round++;
                         $re_cal = false;
                         $is_bot = 1;
@@ -454,6 +477,7 @@ class AnswerGameController extends Controller
 
                 //หาคนที่แทงถูก และจ่ายเครดิต
                 foreach ($yeekeeChitAll as $yeekeeChit) {
+                    $this->ck_mem();
                     //count user 1,16 play
                     if ($yeekeeChit->user->username == $user_1->username) {
                         $user_1_play += $yeekeeChit->total_amount;
@@ -465,6 +489,7 @@ class AnswerGameController extends Controller
 
                     $detailInChit = $yeekeeChit->yeekeeChitDetails;
                     foreach ($detailInChit as $detail) {
+                        $this->ck_mem();
                         $detailSearch = YeekeeChitDetailSearch::findOne(['id' => $detail->id]);
                         $detail->flag_result = $detailSearch->checkWin() ? 1 : 0;
                         $detail->win_credit = $detailSearch->getWinCredit();
@@ -535,6 +560,7 @@ class AnswerGameController extends Controller
                         $percent = empty($model->value) ? 0 : $model->value;
                     }
                     foreach ($commission_user_agent_play as $agent_id => $sum_all_chit_amount) {
+                        $this->ck_mem();
                         $commission_amount = $sum_all_chit_amount * $percent / 100;
                         $remark = Constants::$reason_credit[Constants::reason_credit_commission_in] . ' จับยี่กีรอบที่ ' . $watchYeekee->round . '/' . date('d/m/Y', strtotime($watchYeekee->date_at)) . ' #' . $yeekeeChit->getOrderCommissionId();
                         Commission::commissionWalk(Constants::action_commission_top_up, $agent_id, $admin_id, Constants::reason_commission_top_up, $commission_amount, $remark);
