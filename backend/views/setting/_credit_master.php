@@ -107,7 +107,7 @@ $this->registerJs($js);
                         'label' => 'ผู้กระทำ',
                         'format' => 'html',
                         'value' => function ($model, $key, $index, $column) {
-                            return $model->operator->username;
+                            return $model->operator->username ?? null;
                         }
                     ],
                     [ 		

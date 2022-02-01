@@ -10,6 +10,7 @@ use common\models\PlayType;
 use common\models\ThaiSharedGame;
 use common\models\ThaiSharedGameChit;
 use common\models\ThaiSharedGameChitDetail;
+use common\models\ThaiSharedAnswerGame;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -788,8 +789,40 @@ class SummaryController extends Controller
             AND status IN (1, 9) ORDER BY endDate ASC
         ")->queryAll();
         $dataLotterys = array();
+
         if (!empty($dataLotteryGame)) {
-            foreach ($dataLotteryGame as $val) {
+            foreach ($dataLotteryGame as $val) {   
+                $ThaiSharedAnswerGames = ThaiSharedAnswerGame::find()->where(['thaiSharedGameId' => $val['id']])->joinWith('playType')->orderBy(PlayType::tableName() . '.jackpot_per_unit DESC')->groupBy('playTypeId, number')->all();
+                $cktyp = array();
+                if(!empty($ThaiSharedAnswerGames)){
+                    foreach ($ThaiSharedAnswerGames as $key => $valueTSAG) {                    
+                        $cktyp[$valueTSAG['playTypeId']][] =$valueTSAG['number']       ;
+                    }                    
+                }
+                $win_model_c = array();
+                
+                if(!empty($cktyp)){
+                    foreach ($cktyp as $keycktyp => $valuecktyp) {
+                        $ThaiSharedGameChit = ThaiSharedGameChit::find()->where(['thaiSharedGameId' => $val['id']])->all();
+                        if(!empty($ThaiSharedGameChit)){
+                            $win_model_b = 0;
+                            foreach ($ThaiSharedGameChit as $key => $value) {  
+                                $ThaiSharedGameChitDetail = ThaiSharedGameChitDetail::find()->where(['thaiSharedGameChitId' => $value['id']])->andwhere(['playTypeId' => $keycktyp])->andwhere(['in', 'number', $valuecktyp])->all();
+                                if(!empty($ThaiSharedGameChitDetail)){                                    
+                                    foreach ($ThaiSharedGameChitDetail as $key => $valueTSGCD) {                                        
+                                        $jackPotPerUnit = $valueTSGCD->jackPotPerUnit;
+                                            (string)$win_model_a = ((string)$valueTSGCD->amount * (string)$jackPotPerUnit);
+                                            (string)$win_model_b += (string)$win_model_a;
+                                            $win_model_c['playTypeId'][$valueTSGCD->playTypeId] = (string)$win_model_b;
+                                    }   
+                                    //echo "<pre>",var_dump($win_model_b),"</pre>";
+                                    //exit();                        
+                                }                        
+                            }     
+                            //echo "<pre>",var_dump($win_model_c),"</pre>";     
+                        }                    
+                    }                    
+                }
                 $dataThaiSharedChit = Yii::$app->db->createCommand
                 ("
                     SELECT pl.code, SUM(yd.amount) AS amount, SUM(yd.discount) AS discount, SUM(yd.win_credit) AS win_credit, yc.thaiSharedGameId, yc.status FROM " . ThaiSharedGameChit::tableName() . " yc
@@ -798,8 +831,12 @@ class SummaryController extends Controller
                     WHERE yc.thaiSharedGameId='" . $val['id'] . "' and yc.status != 5 GROUP BY yc.thaiSharedGameId, yd.playTypeId
                 ")->queryAll();
                 $type = array();
+                
                 if (!empty($dataThaiSharedChit)) {
-                    foreach ($dataThaiSharedChit as $dataThaiShared) {
+                    foreach ($dataThaiSharedChit as $key => $dataThaiShared) {
+                        //echo "<pre>",var_dump($dataThaiShared),"</pre>";
+                        //exit();
+                        $win_model = 1+$key;
                         if ($val['gameId'] == Constants::LOTTERYGAME) {
                             $totalAmountLottery += $dataThaiShared['amount'];
                             $totalWinCreditLottery += $dataThaiShared['win_credit'];
@@ -810,6 +847,7 @@ class SummaryController extends Controller
                         $type[$dataThaiShared['code']] = [
                             'amount' => $dataThaiShared['amount'],
                             'discount' => $dataThaiShared['discount'],
+                            'win_model' => $win_model,
                             'win_credit' => $dataThaiShared['win_credit']
                         ];
                     }
@@ -824,6 +862,7 @@ class SummaryController extends Controller
                     'run_under' => (!empty($type) && !empty($type['run_under']) ? $type['run_under'] : ''),
                     'three_top2' => (!empty($type) && !empty($type['three_top2']) ? $type['three_top2'] : ''),
                     'three_und2' => (!empty($type) && !empty($type['three_und2']) ? $type['three_und2'] : ''),
+                    'win_model_c' => (!empty($win_model_c) && !empty($win_model_c['playTypeId']) ? $win_model_c['playTypeId'] : '')
                 ];
             }
         }

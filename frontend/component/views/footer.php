@@ -49,7 +49,8 @@ if (isset($pushers) && $pushers !== '') {
         $title = $pusher->title;
         $link = $pusher->url;
         if ($pusher->image !== '') {
-            $message = '<a href="'.$pusher->url.'"><img src="'.Yii::getAlias('@pusher/').$pusher->image.'" style="width:300px;"></a>';
+            $message = 1;
+            // $message = '<a href="'.$pusher->url.'"><img src="'.Yii::getAlias('@pusher/').$pusher->image.'" style="width:300px;"></a>';
         }else {
             $message = $pusher->message;
         }

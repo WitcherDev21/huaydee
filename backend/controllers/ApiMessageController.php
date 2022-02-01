@@ -19,7 +19,17 @@ use yii\web\ServerErrorHttpException;
 
 class ApiMessageController extends Controller
 {
-	
+    public function logfile($bank,$state, $xx,$message = null,$messageId = null)
+    {
+        $log  = $_SERVER['REMOTE_ADDR'].' - '.date("F j, Y, g:i a").PHP_EOL.
+        "BANK=> ".$bank.PHP_EOL.
+        "STATE=> ".($state==true?'Success':'Failed').PHP_EOL.
+        "DETAIL=>: ".$xx.PHP_EOL.
+        "message=>: ".$message.PHP_EOL.
+        "messageId=>: ".$messageId.PHP_EOL.
+        "-------------------------".PHP_EOL;
+        file_put_contents('log_'.date("j.n.Y").'.txt', $log, FILE_APPEND);
+    }
     public function actionCheckCredit()
     {
 
@@ -41,6 +51,9 @@ class ApiMessageController extends Controller
     ->andWhere(['is_auto' => 0])
     ->andWhere(['in','amount', $amountId])
     ->all();
+    if(!$postCredit){
+        return ['meesage' => 'error'];
+    }
 
     //id ที่ยอดแจ้งฝากตรงกันกับ sms ที่เข้ามา
     $postId = ArrayHelper::getColumn($postCredit, 'poster_id');
@@ -50,6 +63,7 @@ class ApiMessageController extends Controller
 
     //ถ้า error ให้ย้อนกลับ
     $transaction = Yii::$app->db->beginTransaction();
+    if(!empty(array_filter($postCredit))){
     try {
         foreach ($postCredit as $model)
             {
@@ -96,16 +110,14 @@ class ApiMessageController extends Controller
             throw $e;
         }
     }
+    }
 
     public function actionReceived()
     {
-//API Key
-$api_key = 'pcervE-HEopWcVhQiXaNZQ';
-//initialize class with apiKey and AuthToken(if available)
+        //API Key
+        $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $mysms = new \common\libs\Mysms($api_key);
-//lets login user to get AuthToken
         $login_data = array('msisdn' => '+66910452954', 'password' => '290636');
-        
         $login = $mysms->ApiCall('json', '/user/login', $login_data);  //providing REST type(json/xml), resource from http://api.mysms.com/index.html and POST data
         $user_info = json_decode($login); //decode json string to get AuthToken
         $_SESSION['AuthToken'] = $user_info->authToken; //saving auth Token in session for more calls
@@ -119,7 +131,7 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         }
         $mysms->setAuthToken($_SESSION['AuthToken']); //setting up auth Token in class (optional)*/
         
-        //ไืทยพาณิชย์
+        //ไทยพาณิชย์
         $bankName = 'ธนาคารไทยพาณิชย์';
         $sender = '+6627777777';
         $req_data = array('apiKey' => $api_key, 'authToken' => $_SESSION['AuthToken'], 'address' => $sender); //providing AuthToken as per mysms developer doc
@@ -127,13 +139,14 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $messages = json_decode($usercontacts)->messages;
         $smsMessage = SmsMessage::find()->where(['bank' => $bankName])->orderBy(['message_id' => SORT_DESC])->asArray()->all();
         $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');
+        $Datecheck = ArrayHelper::getColumn($smsMessage, 'date');  
 
         foreach ($messages as $message) {
             $now = date('Y-m-d');
             $date = date('Y-m-d', $message->dateSent / 1000);
-            if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            if ($date !== $now || array_search(date('Y-m-d H:s:i', $message->dateSent / 1000), $Datecheck) !== false ) {
                 continue;
-            }
+            }  
             $textMessages = explode(' ', $message->message);
             if (strpos($message->message, 'เข้า') !== false){
                 $amount = floatval(preg_replace('/[^\d\.]+/', '', $textMessages[1]));
@@ -149,7 +162,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
                 $smsMessage->amount = $amount;
                 $smsMessage->date = date('Y-m-d H:i:s', strtotime($dateTime));
                 $smsMessage->bank = $bankName;
-                $smsMessage->save();
+                if($smsMessage->save()){
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }else{
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }
             }
         }
 
@@ -160,17 +177,22 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $usercontacts = $mysms->ApiCall('json', '/user/message/get/by/conversation', $req_data); //calling method ->ApiCall
         $messages = json_decode($usercontacts)->messages;
         $smsMessage = SmsMessage::find()->where(['bank' => $bankName])->orderBy(['message_id' => SORT_DESC])->asArray()->all();
-        $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');
-        foreach ($messages as $message) {
+        $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');    
+        $Datecheck = ArrayHelper::getColumn($smsMessage, 'date');    
+        foreach ($messages as $message) {           
             $now = date('Y-m-d');
             $date = date('Y-m-d', $message->dateSent / 1000);
-            if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            //echo "<pre>",var_dump($Datecheck),"</pre>";
+            //echo "<pre>",var_dump(date('Y-m-d H:s:i', $message->dateSent / 1000)),"</pre>";exit();
+            // if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            //     continue;
+            // }
+            if ($date !== $now || array_search(date('Y-m-d H:s:i', $message->dateSent / 1000), $Datecheck) !== false ) {
                 continue;
-            }
+            }            
             $messages = $message->message;
-                    print_r ($messages);
-
-            if (strpos($messages, 'รับโอนจาก') !== false || strpos($messages, 'เงินเข้า') !== false){
+                    //print_r($messages);
+           if (strpos($messages, 'รับโอนจาก') !== false || strpos($messages, 'เงินเข้า') !== false){
                 $textMessages = explode(' ', $messages);
                 $dateTimes = explode('/', $textMessages[0]);
                 $changedDate = date('Y')."-".$dateTimes[1]."-".$dateTimes[0];
@@ -185,9 +207,14 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
                 $smsMessage->message_id = $message->messageId;
                 $smsMessage->action = 'ฝาก/โอนเงินเข้า';
                 $smsMessage->amount = $amount;
-                $smsMessage->date = date('Y-m-d H:i:s', strtotime($dateTime));
+                $smsMessage->date = date('Y-m-d H:s:i', $message->dateSent / 1000);
                 $smsMessage->bank = $bankName;
-                $smsMessage->save();
+                if($smsMessage->save()){
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }else{
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }
+                
             }
         }
 
@@ -199,13 +226,14 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $messages = json_decode($usercontacts)->messages;
         $smsMessage = SmsMessage::find()->where(['bank' => $bankName])->orderBy(['message_id' => SORT_DESC])->asArray()->all();
         $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');
-        
+        $Datecheck = ArrayHelper::getColumn($smsMessage, 'date');  
+
         foreach ($messages as $message) {
             $now = date('Y-m-d');
             $date = date('Y-m-d', $message->dateSent / 1000);
-            if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            if ($date !== $now || array_search(date('Y-m-d H:s:i', $message->dateSent / 1000), $Datecheck) !== false ) {
                 continue;
-            }
+            } 
             $messages = $message->message;
             if (strpos($messages, 'โอนเข้า') !== false){
                 $textMessages = explode(' ', $messages);
@@ -221,7 +249,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
                 $smsMessage->amount = $amount;
                 $smsMessage->date = date('Y-m-d H:i:s', strtotime($dateTime));
                 $smsMessage->bank = $bankName;
-                $smsMessage->save();
+                if($smsMessage->save()){
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }else{
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }
             }
         }
 
@@ -233,10 +265,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $messages = json_decode($usercontacts)->messages;
         $smsMessage = SmsMessage::find()->where(['bank' => $bankName])->orderBy(['message_id' => SORT_DESC])->asArray()->all();
         $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');
+        $Datecheck = ArrayHelper::getColumn($smsMessage, 'date'); 
         foreach ($messages as $message) {
             $now = date('Y-m-d');
             $date = date('Y-m-d', $message->dateSent / 1000);
-            if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            if ($date !== $now || array_search(date('Y-m-d H:s:i', $message->dateSent / 1000), $Datecheck) !== false ) {
                 continue;
             }
             $messages = $message->message;
@@ -254,7 +287,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
                 $smsMessage->amount = $amount;
                 $smsMessage->date = date('Y-m-d H:i:s', strtotime($dateTime));
                 $smsMessage->bank = $bankName;
-                $smsMessage->save();
+                if($smsMessage->save()){
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }else{
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }
             }
         }
 
@@ -266,12 +303,13 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $messages = json_decode($usercontacts)->messages;
         $smsMessage = SmsMessage::find()->where(['bank' => $bankName])->orderBy(['message_id' => SORT_DESC])->asArray()->all();
         $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');
+        $Datecheck = ArrayHelper::getColumn($smsMessage, 'date'); 
         foreach ($messages as $message) {
             $now = date('Y-m-d');
             $date = date('Y-m-d', $message->dateSent / 1000);
-            if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            if ($date !== $now || array_search(date('Y-m-d H:s:i', $message->dateSent / 1000), $Datecheck) !== false ) {
                 continue;
-            }
+            } 
             $messages = $message->message;
             if (strpos($messages, 'เงินเข้า') !== false){
                 $textMessages = explode(' ', $messages);
@@ -287,7 +325,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
                 $smsMessage->amount = $amount;
                 $smsMessage->date = date('Y-m-d H:i:s', strtotime($dateTime));
                 $smsMessage->bank = $bankName;
-                $smsMessage->save();
+                if($smsMessage->save()){
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }else{
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }
             }
         }
 
@@ -299,10 +341,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
         $messages = json_decode($usercontacts)->messages;
         $smsMessage = SmsMessage::find()->where(['bank' => $bankName])->orderBy(['message_id' => SORT_DESC])->asArray()->all();
         $messageIds = ArrayHelper::getColumn($smsMessage, 'message_id');
+        $Datecheck = ArrayHelper::getColumn($smsMessage, 'date'); 
         foreach ($messages as $message) {
             $now = date('Y-m-d');
             $date = date('Y-m-d', $message->dateSent / 1000);
-            if ($date !== $now || array_search($message->messageId, $messageIds) !== false) {
+            if ($date !== $now || array_search(date('Y-m-d H:s:i', $message->dateSent / 1000), $Datecheck) !== false ) {
                 continue;
             }
             $messages = $message->message;
@@ -319,7 +362,11 @@ $api_key = 'pcervE-HEopWcVhQiXaNZQ';
                 $smsMessage->amount = $amount;
                 $smsMessage->date = date('Y-m-d H:i:s', strtotime($dateTime));
                 $smsMessage->bank = $bankName;
-                $smsMessage->save();
+                if($smsMessage->save()){
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }else{
+                    $this->logfile($bankName,$smsMessage->save(),$usercontacts,$message->message,$message->messageId);
+                }
             }
         }
         return ['message' => 'success'];

@@ -10,6 +10,9 @@ use yii\widgets\Pjax;
 use common\libs\Constants;
 use yii\widgets\Breadcrumbs;
 use yii\helpers\Url;
+use yii\helpers\Html;
+use yii\bootstrap\Modal;
+
 //echo "<pre>",var_dump($dataProvider->query->where[2]['number']),"</pre>";exit();
 $numberja = $dataProvider->query->where[2]['number'];
 $this->registerJsFile(Yii::getAlias('@web/js/poy.js?1552053594'), ['depends' => [\yii\web\JqueryAsset::className()]]);
@@ -50,12 +53,18 @@ $params['breadcrumbs'][] = '#'.$numberja ;
                     'dataProvider' => $dataProvider,
                     'columns' => [
                         [
+                            'label' => 'ID',
+                            'value' => function ($model) {
+                                return $model->id;
+                            }
+                        ],
+                        [
                             'header' => '<div class="text-center">username</div>',
                             'format' => 'html',
                             'value' => function ($model) {            
                                 if($model){
                                     if($model->user){
-                                        $username = $model->user->username;
+                                        $username = $model->user->username."<small style='color: #cacaca;'>(".$model->user->id.")</small>";
                                     }else{
                                         $username = 'ไม่มีข้อมูล';
                                     }
@@ -145,6 +154,43 @@ $params['breadcrumbs'][] = '#'.$numberja ;
                                 }
                                 return $result;
                             }
+                        ],
+                        [   
+                            'label' => 'ยกเลิก',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                $request = Yii::$app->request;      
+                                //echo "<pre>",var_dump($model['thaiSharedGameChitId']),"</pre>";
+                                //exit();
+                                $btn = 'btn-danger';
+                                $text = 'ยกเลิกเลขนี้รายบุคล';
+                                $url =
+                                [
+                                            'thai-shared-chit/cancelnumberbyuser',
+                                            //'thaiSharedGameChitId' => $model['thaiSharedGameChitId'],
+                                            'number' => $model['number'],
+                                            'uid' => $model->user->id,
+                                            'createdAt' => $request->get('ThaiSharedGameChitDetailSearch')['createdAt'],
+                                            'endDate' => $request->get('ThaiSharedGameChitDetailSearch')['endDate'],
+                                            'playtypeid' => $request->get('ThaiSharedGameChitDetailSearch')['playTypeId'],
+                                ];
+                                $result = Html::a(Yii::t('app', ' {modelClass}', [
+                                    'modelClass' => $text,
+                                ]), $url,
+                                    [
+                                        'class' => 'data-update btn btn-xs ' . $btn,
+                                        'style' => 'color:#ffffff;', 
+                                        'data-target' => '#update-modal',
+                                        'data-id' => $model['number'],                                                    
+                                        'data-start' => $request->get('ThaiSharedGameChitDetailSearch')['createdAt'],
+                                        'data-end' => $request->get('ThaiSharedGameChitDetailSearch')['endDate'],
+                                        'data-playtypeid' => $request->get('ThaiSharedGameChitDetailSearch')['playTypeId'],
+                                        'data-toggle' => 'modal',
+                                        'data-uid' => $model->user->id,
+                                    ]
+                                );
+                                return $result;
+                            }                  
                         ]
                     ],
                     'showFooter' => true,
@@ -160,4 +206,73 @@ $params['breadcrumbs'][] = '#'.$numberja ;
 
 <?php echo $this->render('modal_delete_number', [
         'number' => $numberja 
-]) ?>
+]);
+
+
+
+Modal::begin ([
+    'id' => 'update-modal',
+    'header' => '<h4 class = "modal-title"> ข้อความแจ้งเตือน </h4>',
+    'footer' => '<a href="#" class="btn btn-primary" data-dismiss="modal"> ปิด </a><button type="button" data-uid=""  data-key="" data-start="" data-end="" data-playtypeid="" class="btn btn-danger cancelnumberbyuserconfirm">ยกเลิกเลขนี้</button>',
+]); 
+echo '<h6>คุณต้องการยกเลิกเลขที่ #<span></span> ของคุณ <user></user> ใช่หรือไม่ ?</h6>';
+$requestUpdateUrl = Url::toRoute ('cancelnumberconfirm');
+$updateJs=<<<JS
+    var modalConfirmNumberByUser = function (callback,nb,start,end,playtypeid,uid) {
+        $('.data-update').on('click', function () {
+        $('.modal-body  span').html($(this).data('id'));
+        $('.modal-footer button.cancelnumberbyuserconfirm').attr('data-key',$(this).data('id'));   
+        $('.modal-footer button.cancelnumberbyuserconfirm').attr('data-start',$(this).data('start'));        
+        $('.modal-footer button.cancelnumberbyuserconfirm').attr('data-end',$(this).data('end'));      
+        $('.modal-footer button.cancelnumberbyuserconfirm').attr('data-playtypeid',$(this).data('playtypeid'));      
+        $('.modal-footer button.cancelnumberbyuserconfirm').attr('data-uid',$(this).data('uid'));  
+    });
+    $(".modal-footer button.cancelnumberbyuserconfirm").on("click", function () {
+        callback(true,$(this).data('key'),$(this).data('start'),$(this).data('end'),$(this).data('playtypeid'),$(this).data('uid'));        
+        $("#update-modal").modal('hide');
+    });
+};
+modalConfirmNumberByUser(function (confirm,nb,start,end,playtypeid,uid) {
+    console.log(end);
+    if (confirm) {
+        abort_poyNumberByUser(nb,start,end,playtypeid,uid);
+        //console.info(s);
+    }
+});
+function abort_poyNumberByUser(nb,start,end,playtypeid,uid) {
+        //show('loading', true);
+        $.ajax({
+            url: 'cancel-number-by-user?number='+nb+'&createdAt='+start+'&endDate='+end+'&playTypeId='+playtypeid+'&uid='+uid,
+            cache: false,
+            type: 'post',
+            data: {
+                poy_id: $(this).data('key'),
+                createdAt: $(this).data('start'),
+                endDate: $(this).data('end'),
+                playtypeid: $(this).data('playtypeid'),
+                uid: $(this).data('uid'),
+                _csrf: yii.getCsrfToken()
+            },
+            success: function (data) {
+                            swal({
+                                title: "ข้อความแจ้งเตือน!",
+                                text:  data.message+' กำลังโหลดหน้า...',
+                                type: data.s,
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        window.setTimeout(function(){ } ,3000);
+                        //location.reload();              
+                        //window.location.reload();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                //show('loading', false);
+            }
+        });
+
+};
+JS;
+
+$this->registerJs($updateJs);
+Modal::end();
+?>
