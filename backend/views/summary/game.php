@@ -1007,8 +1007,10 @@ $totalWinCreditReserveThaiShared = 0;
                                 $discountLotteryThaiShared = 0;
                                 $win_modelLotteryThaiShared = 0;
                                 $win_creditLotteryThaiShared = 0;
-                                foreach ($arrnew as $key => $value) {
-                                    $win_modelLotteryThaiShared = $win_modelLotteryThaiShared + (!empty($val['win_model_c'][$value]) ? $val['win_model_c'][$value] : 0);
+                                if(!empty($val['win_model_c'])){
+                                    foreach ($val['win_model_c'] as $key => $value) {
+                                        $win_modelLotteryThaiShared = $win_modelLotteryThaiShared + (!empty($value) ? $value : 0);
+                                    }                                    
                                 }
                                 foreach ($arr as $t) {
                                     $amountLotteryThaiShared = $amountLotteryThaiShared + (!empty($val[$t]) ? $val[$t]['amount'] : 0);

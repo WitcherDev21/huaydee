@@ -800,26 +800,26 @@ class SummaryController extends Controller
                     }                    
                 }
                 $win_model_c = array();
-                $win_model_b = 0;
+                
                 if(!empty($cktyp)){
                     foreach ($cktyp as $keycktyp => $valuecktyp) {
                         $ThaiSharedGameChit = ThaiSharedGameChit::find()->where(['thaiSharedGameId' => $val['id']])->all();
                         if(!empty($ThaiSharedGameChit)){
+                            $win_model_b = 0;
                             foreach ($ThaiSharedGameChit as $key => $value) {  
                                 $ThaiSharedGameChitDetail = ThaiSharedGameChitDetail::find()->where(['thaiSharedGameChitId' => $value['id']])->andwhere(['playTypeId' => $keycktyp])->andwhere(['in', 'number', $valuecktyp])->all();
-                                if(!empty($ThaiSharedGameChitDetail)){
-                                    
-                                    foreach ($ThaiSharedGameChitDetail as $key => $valueTSGCD) {
+                                if(!empty($ThaiSharedGameChitDetail)){                                    
+                                    foreach ($ThaiSharedGameChitDetail as $key => $valueTSGCD) {                                        
                                         $jackPotPerUnit = $valueTSGCD->jackPotPerUnit;
-                                        (string)$win_model_a = ((string)$valueTSGCD->amount * (string)$jackPotPerUnit);
-                                        (string)$win_model_b += (string)$win_model_a;
-                                        $win_model_c['playTypeId'][$keycktyp] = (string)$win_model_b;
+                                            (string)$win_model_a = ((string)$valueTSGCD->amount * (string)$jackPotPerUnit);
+                                            (string)$win_model_b += (string)$win_model_a;
+                                            $win_model_c['playTypeId'][$valueTSGCD->playTypeId] = (string)$win_model_b;
                                     }   
                                     //echo "<pre>",var_dump($win_model_b),"</pre>";
                                     //exit();                        
                                 }                        
                             }     
-                            //echo "<pre>",var_dump($win_model_b),"</pre>";     
+                            //echo "<pre>",var_dump($win_model_c),"</pre>";     
                         }                    
                     }                    
                 }
